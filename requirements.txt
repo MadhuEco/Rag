@@ -1,0 +1,8 @@
+openai
+chromadb
+python-dotenv
+requests
+tiktoken
+pypdf
+beautifulsoup4
+streamlit
