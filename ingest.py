@@ -19,7 +19,7 @@ from openai import AzureOpenAI
 
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────────────
+
 CORPUS_DIR = Path("data/raw")
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "ecolab_corpus"
