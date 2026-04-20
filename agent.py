@@ -16,7 +16,7 @@ from openai import AzureOpenAI
 
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────────────
+
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "ecolab_corpus"
 TOP_K = 5
