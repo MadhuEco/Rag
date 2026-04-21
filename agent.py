@@ -1,7 +1,4 @@
-
-import json
 import os
-from datetime import date, timedelta
 
 import chromadb
 import requests
@@ -15,7 +12,7 @@ from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 
 load_dotenv()
 
-
+# ── Config ────────────────────────────────────────────────────────────────────
 
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "ecolab_corpus"
@@ -23,7 +20,7 @@ TOP_K = 5
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
-# ── LangChain clients
+# ── LangChain clients ─────────────────────────────────────────────────────────
 
 llm = AzureChatOpenAI(
     azure_deployment=CHAT_MODEL,
@@ -68,71 +65,103 @@ def retrieve(query: str) -> str:
     return "\n\n".join(parts)
 
 
-# ── Tool: USGS Water Quality ──────────────────────────────────────────────────
+# ── Tool: EPA FRS Facilities ──────────────────────────────────────────────────
+
+EPA_FRS_URL = "https://frs-public.epa.gov/ords/frs_public2/frs_rest_services.get_facilities"
 
 @tool
-def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
+def get_epa_facilities(
+    zip_code: str,
+    pgm_sys_acrnm: str = "SEMS",
+    program_output: str = "yes",
+) -> str:
     """
-    Fetch recent water quality measurements from the USGS Water Quality Portal
-    for a US state. Use when the user asks for current/recent measured data at a
-    specific US location. Do NOT call for general conceptual questions.
+    Fetch EPA-regulated facility information from the EPA Facility Registry
+    Service (FRS) for a given US ZIP code. Use when the user asks about
+    nearby EPA facilities, Superfund sites, or regulated locations at a
+    specific ZIP code. Do NOT call for general conceptual questions.
 
     Args:
-        state_code: Two-letter US state abbreviation, e.g. 'TX', 'CA'.
-        characteristic_name: Parameter to filter by, e.g. 'pH', 'Turbidity',
-                             'Dissolved oxygen'. Optional.
+        zip_code: US ZIP code to search, e.g. '60085', '77001'.
+        pgm_sys_acrnm: EPA program system acronym to filter by.
+                       Common values:
+                         'SEMS'    — Superfund / hazardous waste sites (default)
+                         'RCRAINFO'— Resource Conservation & Recovery Act
+                         'ICIS-AIR'— Air emissions facilities
+                         'NPDES'   — Water discharge permits
+                         'TRIS'    — Toxic Release Inventory
+        program_output: Include linked EPA program details ('yes' or 'no').
+                        Defaults to 'yes'.
     """
-    since = (date.today() - timedelta(days=365)).strftime("%m-%d-%Y")
     params = {
-        "statecode": f"US:{state_code.upper()}",
-        "mimeType": "json",
-        "sorted": "yes",
-        "startDateLo": since,
-        "dataProfile": "resultPhysChem",
-        "pageSize": 5,
-        "pageNumber": 1,
+        "pgm_sys_acrnm": pgm_sys_acrnm.upper(),
+        "zip_code": zip_code.strip(),
+        "program_output": program_output,
+        "output": "JSON",
     }
-    if characteristic_name:
-        params["characteristicName"] = characteristic_name
 
     try:
-        r = requests.get(
-            "https://www.waterqualitydata.us/data/Result/search",
-            params=params,
-            timeout=15,
-        )
+        r = requests.get(EPA_FRS_URL, params=params, timeout=30, verify=False)
         r.raise_for_status()
         data = r.json()
     except Exception as e:
-        return f"Error fetching water quality data: {e}"
+        return f"Error fetching EPA FRS data: {e}"
 
-    if not data:
-        label = f"{state_code}" + (f" / {characteristic_name}" if characteristic_name else "")
-        return f"No results found for {label}."
+    # The API returns a dict with a list under various top-level keys
+    facilities = (
+        data.get("Results", {}).get("FRSFacility")          # common wrapper
+        or data.get("Facilities")
+        or (data if isinstance(data, list) else None)
+    )
 
-    lines = [f"USGS Water Quality — {state_code.upper()} ({characteristic_name or 'all parameters'})\n"]
-    for i, row in enumerate(data[:5], 1):
-        lines.append(
-            f"{i}. [{row.get('ActivityStartDate', 'N/A')}] "
-            f"{row.get('CharacteristicName', 'N/A')}: "
-            f"{row.get('ResultMeasureValue', 'N/A')} "
-            f"{row.get('ResultMeasure/MeasureUnitCode', '')}  "
-            f"(site: {row.get('MonitoringLocationIdentifier', 'N/A')})"
+    if not facilities:
+        return (
+            f"No EPA facilities found for ZIP code {zip_code} "
+            f"under program '{pgm_sys_acrnm}'."
         )
+
+    lines = [
+        f"EPA FRS Facilities — ZIP {zip_code} | Program: {pgm_sys_acrnm.upper()}\n"
+    ]
+    for i, fac in enumerate(facilities[:5], 1):
+        name        = fac.get("FacilityName") or fac.get("PRIMARY_NAME", "N/A")
+        registry_id = fac.get("RegistryId")   or fac.get("REGISTRY_ID", "N/A")
+        address     = fac.get("LocationAddress") or fac.get("LOCATION_ADDRESS", "N/A")
+        city        = fac.get("CityName")     or fac.get("CITY_NAME", "")
+        state       = fac.get("StateCode")    or fac.get("STATE_CODE", "")
+        lat         = fac.get("Latitude83")   or fac.get("LATITUDE83", "N/A")
+        lon         = fac.get("Longitude83")  or fac.get("LONGITUDE83", "N/A")
+
+        # Linked program details (present when program_output='yes')
+        programs = fac.get("FRSPrograms") or fac.get("Programs") or []
+        prog_summary = ""
+        if programs:
+            prog_names = [
+                p.get("ProgramSystemAcronym") or p.get("PROGRAM_SYS_ACRNM", "")
+                for p in programs[:3]
+            ]
+            prog_summary = f" | Linked programs: {', '.join(filter(None, prog_names))}"
+
+        lines.append(
+            f"{i}. {name} (Registry ID: {registry_id})\n"
+            f"   Address : {address}, {city}, {state}\n"
+            f"   Coords  : {lat}, {lon}{prog_summary}"
+        )
+
     return "\n".join(lines)
 
 
 # ── Agent setup ───────────────────────────────────────────────────────────────
 
-TOOLS = [get_water_quality]
+TOOLS = [get_epa_facilities]
 
 SYSTEM_TEMPLATE = """\
 You are an expert assistant for Ecolab's domains: water treatment, hygiene, and sustainability.
 
 You have two information sources:
 1. Retrieved document context (injected below) — use for conceptual/factual questions.
-2. get_water_quality tool — use ONLY when the user asks for current/recent measured \
-data at a specific US location.
+2. get_epa_facilities tool — use ONLY when the user asks about EPA-regulated facilities,
+   Superfund sites, or compliance locations at a specific US ZIP code.
 
 Always cite which source you used. Be concise and factual.
 
