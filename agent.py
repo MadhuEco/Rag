@@ -12,10 +12,16 @@ from datetime import date, timedelta
 import chromadb
 import requests
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+from langchain.tools import tool
+from langchain_community.vectorstores import Chroma
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
+from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 
 load_dotenv()
 
+# ── Config ────────────────────────────────────────────────────────────────────
 
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "ecolab_corpus"
@@ -23,63 +29,65 @@ TOP_K = 5
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
-client = AzureOpenAI(
-    api_key=os.environ["AZURE_OPENAI_API_KEY"],
+# ── LangChain clients ─────────────────────────────────────────────────────────
+
+llm = AzureChatOpenAI(
+    azure_deployment=CHAT_MODEL,
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", "https://cds-ds-openai-001-x.openai.azure.com/"),
+    api_key=os.environ["AZURE_OPENAI_API_KEY"],
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview"),
+    temperature=0,
+)
+
+embeddings = AzureOpenAIEmbeddings(
+    azure_deployment=EMBEDDING_MODEL,
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", "https://cds-ds-openai-001-x.openai.azure.com/"),
+    api_key=os.environ["AZURE_OPENAI_API_KEY"],
     api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview"),
 )
 
-# ChromaDB — opened once at import time
-_db = chromadb.PersistentClient(path=CHROMA_DIR)
-_col = _db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
+# ── ChromaDB via LangChain ────────────────────────────────────────────────────
+
+_chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
+
+vectorstore = Chroma(
+    client=_chroma_client,
+    collection_name=COLLECTION,
+    embedding_function=embeddings,
+    collection_metadata={"hnsw:space": "cosine"},
+)
+
+retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
 
 
-# ── Retrieval ─────────────────────────────────────────────────────────────────
+# ── Retrieval helper ──────────────────────────────────────────────────────────
 
 def retrieve(query: str) -> str:
     """Embed query, fetch top-k chunks, return formatted context string."""
-    vector = client.embeddings.create(model=EMBEDDING_MODEL, input=query).data[0].embedding
-    results = _col.query(query_embeddings=[vector], n_results=TOP_K, include=["documents", "metadatas"])
-
+    docs = retriever.invoke(query)
+    if not docs:
+        return "No relevant context found."
     parts = []
-    for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0]), 1):
-        parts.append(f"[Context {i} — {meta.get('source', 'unknown')}]\n{doc.strip()}")
-
-    return "\n\n".join(parts) if parts else "No relevant context found."
+    for i, doc in enumerate(docs, 1):
+        source = doc.metadata.get("source", "unknown")
+        parts.append(f"[Context {i} — {source}]\n{doc.page_content.strip()}")
+    return "\n\n".join(parts)
 
 
 # ── Tool: USGS Water Quality ──────────────────────────────────────────────────
 
-TOOL_SCHEMA = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_water_quality",
-            "description": (
-                "Fetch recent water quality measurements from the USGS Water Quality Portal "
-                "for a US state. Use when the user asks for current/recent measured data at a "
-                "specific US location. Do NOT call for general conceptual questions."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "state_code": {
-                        "type": "string",
-                        "description": "Two-letter US state abbreviation, e.g. 'TX', 'CA'.",
-                    },
-                    "characteristic_name": {
-                        "type": "string",
-                        "description": "Parameter to filter by, e.g. 'pH', 'Turbidity', 'Dissolved oxygen'. Optional.",
-                    },
-                },
-                "required": ["state_code"],
-            },
-        },
-    }
-]
-
-
+@tool
 def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
+    """
+    Fetch recent water quality measurements from the USGS Water Quality Portal
+    for a US state. Use when the user asks for current/recent measured data at a
+    specific US location. Do NOT call for general conceptual questions.
+
+    Args:
+        state_code: Two-letter US state abbreviation, e.g. 'TX', 'CA'.
+        characteristic_name: Parameter to filter by, e.g. 'pH', 'Turbidity',
+                             'Dissolved oxygen'. Optional.
+    """
     since = (date.today() - timedelta(days=365)).strftime("%m-%d-%Y")
     params = {
         "statecode": f"US:{state_code.upper()}",
@@ -94,14 +102,19 @@ def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
         params["characteristicName"] = characteristic_name
 
     try:
-        r = requests.get("https://www.waterqualitydata.us/data/Result/search", params=params, timeout=15)
+        r = requests.get(
+            "https://www.waterqualitydata.us/data/Result/search",
+            params=params,
+            timeout=15,
+        )
         r.raise_for_status()
         data = r.json()
     except Exception as e:
         return f"Error fetching water quality data: {e}"
 
     if not data:
-        return f"No results found for {state_code}" + (f" / {characteristic_name}" if characteristic_name else "") + "."
+        label = f"{state_code}" + (f" / {characteristic_name}" if characteristic_name else "")
+        return f"No results found for {label}."
 
     lines = [f"USGS Water Quality — {state_code.upper()} ({characteristic_name or 'all parameters'})\n"]
     for i, row in enumerate(data[:5], 1):
@@ -115,51 +128,79 @@ def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
     return "\n".join(lines)
 
 
-# ── Agent loop ────────────────────────────────────────────────────────────────
+# ── Agent setup ───────────────────────────────────────────────────────────────
 
-SYSTEM_BASE = """\
+TOOLS = [get_water_quality]
+
+SYSTEM_TEMPLATE = """\
 You are an expert assistant for Ecolab's domains: water treatment, hygiene, and sustainability.
 
 You have two information sources:
 1. Retrieved document context (injected below) — use for conceptual/factual questions.
-2. get_water_quality tool — use ONLY when the user asks for current/recent measured data at a specific US location.
-
+2. get_water_quality tool — use ONLY when the user asks for current/recent measured \
+data at a specific US location.
 
 Always cite which source you used. Be concise and factual.
+
+---
+Retrieved context:
+
+{context}
 """
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", SYSTEM_TEMPLATE),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+        MessagesPlaceholder("agent_scratchpad"),
+    ]
+)
+
+agent = create_tool_calling_agent(llm=llm, tools=TOOLS, prompt=prompt)
+
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=TOOLS,
+    max_iterations=3,
+    verbose=False,
+    return_intermediate_steps=False,
+)
+
+
+# ── Public chat function (matches app.py contract) ────────────────────────────
+
+def _to_lc_messages(history: list[dict]) -> list:
+    """Convert simple {role, content} dicts to LangChain message objects."""
+    mapping = {"user": HumanMessage, "assistant": AIMessage}
+    return [mapping[m["role"]](content=m["content"]) for m in history if m["role"] in mapping]
 
 
 def chat(user_message: str, history: list[dict]) -> tuple[str, list[dict]]:
     """
     One agent turn.
-    history: list of {role, content} dicts (no system message).
-    Returns (reply, updated_history).
+
+    Args:
+        user_message: The latest user input.
+        history: List of {role, content} dicts (no system message).
+
+    Returns:
+        (reply, updated_history)
     """
     context = retrieve(user_message)
-    system = SYSTEM_BASE + "\n\n---\nRetrieved context:\n\n" + context
+    lc_history = _to_lc_messages(history)
 
-    messages = [{"role": "system", "content": system}] + history + [{"role": "user", "content": user_message}]
+    result = agent_executor.invoke(
+        {
+            "input": user_message,
+            "context": context,
+            "chat_history": lc_history,
+        }
+    )
 
-    # Tool-call loop (max 3 iterations)
-    for _ in range(3):
-        response = client.chat.completions.create(
-            model=CHAT_MODEL,
-            messages=messages,
-            tools=TOOL_SCHEMA,
-            tool_choice="auto",
-        )
-        msg = response.choices[0].message
-
-        if not msg.tool_calls:
-            break
-
-        # Execute tool calls
-        messages.append(msg.model_dump(exclude_unset=True))
-        for tc in msg.tool_calls:
-            args = json.loads(tc.function.arguments)
-            result = get_water_quality(**args)
-            messages.append({"role": "tool", "tool_call_id": tc.id, "name": tc.function.name, "content": result})
-
-    reply = msg.content or ""
-    updated = history + [{"role": "user", "content": user_message}, {"role": "assistant", "content": reply}]
+    reply = result.get("output", "")
+    updated = history + [
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": reply},
+    ]
     return reply, updated
