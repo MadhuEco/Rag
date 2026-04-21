@@ -1,9 +1,3 @@
-"""
-agent.py
---------
-RAG retrieval, USGS tool definition, and the tool-call loop — all in one place.
-Imported by app.py (Streamlit).
-"""
 
 import json
 import os
@@ -21,7 +15,7 @@ from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────────────
+
 
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "ecolab_corpus"
@@ -29,7 +23,7 @@ TOP_K = 5
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
-# ── LangChain clients ─────────────────────────────────────────────────────────
+# ── LangChain clients
 
 llm = AzureChatOpenAI(
     azure_deployment=CHAT_MODEL,

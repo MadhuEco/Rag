@@ -1,9 +1,4 @@
-"""
-app.py — Streamlit chat interface.
 
-Run with:
-    streamlit run app.py
-"""
 
 import streamlit as st
 from agent import chat
