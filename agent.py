@@ -47,25 +47,35 @@ TOOL_SCHEMA = [
     {
         "type": "function",
         "function": {
-            "name": "get_water_quality",
+            "name": "get_epa_facilities",
             "description": (
-                "Fetch recent water quality measurements from the USGS Water Quality Portal "
-                "for a US state. Use when the user asks for current/recent measured data at a "
-                "specific US location. Do NOT call for general conceptual questions."
+                "Fetch EPA-regulated facility information from the EPA Facility Registry "
+                "Service (FRS) for a given US ZIP code. Use when the user asks about "
+                "nearby EPA facilities, Superfund sites, or regulated locations at a "
+                "specific ZIP code. Do NOT call for general conceptual questions."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "state_code": {
+                    "zip_code": {
                         "type": "string",
-                        "description": "Two-letter US state abbreviation, e.g. 'TX', 'CA'.",
+                        "description": "US ZIP code to search, e.g. '60085', '77001'.",
                     },
-                    "characteristic_name": {
+                    "pgm_sys_acrnm": {
                         "type": "string",
-                        "description": "Parameter to filter by, e.g. 'pH', 'Turbidity', 'Dissolved oxygen'. Optional.",
+                        "description": (
+                            "EPA program system acronym to filter by. "
+                            "Common values: 'SEMS' (Superfund, default), "
+                            "'RCRAINFO' (hazardous waste), 'ICIS-AIR' (air emissions), "
+                            "'NPDES' (water discharge permits), 'TRIS' (toxic release inventory)."
+                        ),
+                    },
+                    "program_output": {
+                        "type": "string",
+                        "description": "Include linked EPA program details. 'yes' or 'no'. Defaults to 'yes'.",
                     },
                 },
-                "required": ["state_code"],
+                "required": ["zip_code"],
             },
         },
     }
@@ -107,15 +117,97 @@ def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
         )
     return "\n".join(lines)
 
+EPA_FRS_URL = "https://frs-public.epa.gov/ords/frs_public2/frs_rest_services.get_facilities"
+def get_epa_facilities(
+    zip_code: str,
+    pgm_sys_acrnm: str = "SEMS",
+    program_output: str = "yes",
+) -> str:
+    """
+    Fetch EPA-regulated facility information from the EPA Facility Registry
+    Service (FRS) for a given US ZIP code. Use when the user asks about
+    nearby EPA facilities, Superfund sites, or regulated locations at a
+    specific ZIP code. Do NOT call for general conceptual questions.
+
+    Args:
+        zip_code: US ZIP code to search, e.g. '60085', '77001'.
+        pgm_sys_acrnm: EPA program system acronym to filter by.
+                       Common values:
+                         'SEMS'    — Superfund / hazardous waste sites (default)
+                         'RCRAINFO'— Resource Conservation & Recovery Act
+                         'ICIS-AIR'— Air emissions facilities
+                         'NPDES'   — Water discharge permits
+                         'TRIS'    — Toxic Release Inventory
+        program_output: Include linked EPA program details ('yes' or 'no').
+                        Defaults to 'yes'.
+    """
+    params = {
+        "pgm_sys_acrnm": pgm_sys_acrnm.upper(),
+        "zip_code": zip_code.strip(),
+        "program_output": program_output,
+        "output": "JSON",
+    }
+
+    try:
+        r = requests.get(EPA_FRS_URL, params=params, timeout=30, verify=False)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:
+        return f"Error fetching EPA FRS data: {e}"
+
+    # The API returns a dict with a list under various top-level keys
+    facilities = (
+        data.get("Results", {}).get("FRSFacility")          # common wrapper
+        or data.get("Facilities")
+        or (data if isinstance(data, list) else None)
+    )
+
+    if not facilities:
+        return (
+            f"No EPA facilities found for ZIP code {zip_code} "
+            f"under program '{pgm_sys_acrnm}'."
+        )
+
+    lines = [
+        f"EPA FRS Facilities — ZIP {zip_code} | Program: {pgm_sys_acrnm.upper()}\n"
+    ]
+    for i, fac in enumerate(facilities[:5], 1):
+        name        = fac.get("FacilityName") 
+        registry_id = fac.get("RegistryId")   
+        address     = fac.get("LocationAddress") 
+        city        = fac.get("CityName")     
+        state       = fac.get("StateAbbr")    
+        lat         = fac.get("Latitude83")  
+        lon         = fac.get("Longitude83") 
+
+        # Linked program details (present when program_output='yes')
+        programs = fac.get("ProgramFacilities")
+        prog_summary = ""
+        if programs:
+            prog_names = [
+                p.get("ProgramSystemAcronym")
+                for p in programs[:3]
+            ]
+            prog_summary = f" | Linked programs: {', '.join(filter(None, prog_names))}"
+
+        lines.append(
+            f"{i}. {name} (Registry ID: {registry_id})\n"
+            f"   Address : {address}, {city}, {state}\n"
+            f"   Coords  : {lat}, {lon}{prog_summary}"
+        )
+
+    return "\n".join(lines)
 
 # ── Agent loop ────────────────────────────────────────────────────────────────
 
 SYSTEM_BASE = """\
 You are an expert assistant for Ecolab's domains: water treatment, hygiene, and sustainability.
+You should never answer question apart from these information.
 
 You have two information sources:
 1. Retrieved document context (injected below) — use for conceptual/factual questions.
-2. get_water_quality tool — use ONLY when the user asks for current/recent measured data at a specific US location.
+2. get_epa_facilities tool — use ONLY when the user asks about EPA-regulated facilities,
+   Superfund sites, or regulated locations at a specific US ZIP code.
 
 
 Always cite which source you used. Be concise and factual.
@@ -150,7 +242,7 @@ def chat(user_message: str, history: list[dict]) -> tuple[str, list[dict]]:
         messages.append(msg.model_dump(exclude_unset=True))
         for tc in msg.tool_calls:
             args = json.loads(tc.function.arguments)
-            result = get_water_quality(**args)
+            result = get_epa_facilities(**args)
             messages.append({"role": "tool", "tool_call_id": tc.id, "name": tc.function.name, "content": result})
 
     reply = msg.content or ""

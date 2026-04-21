@@ -2,5 +2,6 @@
 __pycache__/
 .venv/
 chroma_db/
+chroma_db1/
 data/raw/*.pdf
 data/raw/*.html
