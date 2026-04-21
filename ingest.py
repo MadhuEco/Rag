@@ -1,13 +1,3 @@
-"""
-ingest.py
----------
-Load documents from data/raw/, chunk them, embed with Azure OpenAI,
-and store in ChromaDB.
-
-Run once before starting the app:
-    python ingest.py
-"""
-
 import os
 import re
 from pathlib import Path

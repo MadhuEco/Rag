@@ -1,10 +1,3 @@
-"""
-agent.py
---------
-RAG retrieval, USGS tool definition, and the tool-call loop — all in one place.
-Imported by app.py (Streamlit).
-"""
-
 import json
 import os
 from datetime import date, timedelta
