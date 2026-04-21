@@ -1,5 +1,3 @@
-
-
 import os
 from pathlib import Path
 
@@ -14,7 +12,7 @@ load_dotenv()
 # ── Config ────────────────────────────────────────────────────────────────────
 
 CORPUS_DIR = Path("data/raw")
-CHROMA_DIR = "./chroma_db"
+CHROMA_DIR = "./chroma_db1"
 COLLECTION = "ecolab_corpus"
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 64

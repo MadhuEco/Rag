@@ -14,7 +14,7 @@ load_dotenv()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-CHROMA_DIR = "./chroma_db"
+CHROMA_DIR = "./chroma_db1"
 COLLECTION = "ecolab_corpus"
 TOP_K = 5
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
@@ -124,20 +124,20 @@ def get_epa_facilities(
         f"EPA FRS Facilities — ZIP {zip_code} | Program: {pgm_sys_acrnm.upper()}\n"
     ]
     for i, fac in enumerate(facilities[:5], 1):
-        name        = fac.get("FacilityName") or fac.get("PRIMARY_NAME", "N/A")
-        registry_id = fac.get("RegistryId")   or fac.get("REGISTRY_ID", "N/A")
-        address     = fac.get("LocationAddress") or fac.get("LOCATION_ADDRESS", "N/A")
-        city        = fac.get("CityName")     or fac.get("CITY_NAME", "")
-        state       = fac.get("StateCode")    or fac.get("STATE_CODE", "")
-        lat         = fac.get("Latitude83")   or fac.get("LATITUDE83", "N/A")
-        lon         = fac.get("Longitude83")  or fac.get("LONGITUDE83", "N/A")
+        name        = fac.get("FacilityName") 
+        registry_id = fac.get("RegistryId")   
+        address     = fac.get("LocationAddress") 
+        city        = fac.get("CityName")     
+        state       = fac.get("StateAbbr")    
+        lat         = fac.get("Latitude83")  
+        lon         = fac.get("Longitude83") 
 
         # Linked program details (present when program_output='yes')
-        programs = fac.get("FRSPrograms") or fac.get("Programs") or []
+        programs = fac.get("ProgramFacilities")
         prog_summary = ""
         if programs:
             prog_names = [
-                p.get("ProgramSystemAcronym") or p.get("PROGRAM_SYS_ACRNM", "")
+                p.get("ProgramSystemAcronym")
                 for p in programs[:3]
             ]
             prog_summary = f" | Linked programs: {', '.join(filter(None, prog_names))}"
