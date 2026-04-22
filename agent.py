@@ -137,48 +137,8 @@ def get_epa_facilities(
     except Exception as e:
         return f"Error fetching EPA FRS data: {e}"
 
-    # The API returns a dict with a list under various top-level keys
-    facilities = (
-        data.get("Results", {}).get("FRSFacility")          # common wrapper
-        or data.get("Facilities")
-        or (data if isinstance(data, list) else None)
-    )
-
-    if not facilities:
-        return (
-            f"No EPA facilities found for ZIP code {zip_code} "
-            f"under program '{pgm_sys_acrnm}'."
-        )
-
-    lines = [
-        f"EPA FRS Facilities — ZIP {zip_code} | Program: {pgm_sys_acrnm.upper()}\n"
-    ]
-    for i, fac in enumerate(facilities[:5], 1):
-        name        = fac.get("FacilityName") 
-        registry_id = fac.get("RegistryId")   
-        address     = fac.get("LocationAddress") 
-        city        = fac.get("CityName")     
-        state       = fac.get("StateAbbr")    
-        lat         = fac.get("Latitude83")  
-        lon         = fac.get("Longitude83") 
-
-        # Linked program details (present when program_output='yes')
-        programs = fac.get("ProgramFacilities")
-        prog_summary = ""
-        if programs:
-            prog_names = [
-                p.get("ProgramSystemAcronym")
-                for p in programs[:3]
-            ]
-            prog_summary = f" | Linked programs: {', '.join(filter(None, prog_names))}"
-
-        lines.append(
-            f"{i}. {name} (Registry ID: {registry_id})\n"
-            f"   Address : {address}, {city}, {state}\n"
-            f"   Coords  : {lat}, {lon}{prog_summary}"
-        )
-
-    return "\n".join(lines)
+    data = json.dumps(data)
+    return data
 
 # ── Agent loop ────────────────────────────────────────────────────────────────
 
