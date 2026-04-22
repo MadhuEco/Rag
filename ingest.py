@@ -69,11 +69,11 @@ def embed(texts: list[str]) -> list[list[float]]:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    supported = {".pdf", ".html", ".htm", ".txt", ".md"}
+    supported = {".pdf", ".txt", ".md"}
     files = [f for f in sorted(CORPUS_DIR.glob("**/*")) if f.suffix in supported]
 
     if not files:
-        print(f"No documents found in {CORPUS_DIR}. Add .pdf / .html / .txt files.")
+        print(f"No documents found in {CORPUS_DIR}. Add .pdf / .txt files.")
         return
 
     print(f"Found {len(files)} file(s). Loading and chunking...")
