@@ -23,8 +23,8 @@ client = AzureOpenAI(
 )
 
 # ChromaDB — opened once at import time
-_db = chromadb.PersistentClient(path=CHROMA_DIR)
-_col = _db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
+db = chromadb.PersistentClient(path=CHROMA_DIR)
+col = db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
 
 
 # ── Retrieval ─────────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ _col = _db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"
 def retrieve(query: str) -> str:
     """Embed query, fetch top-k chunks, return formatted context string."""
     vector = client.embeddings.create(model=EMBEDDING_MODEL, input=query).data[0].embedding
-    results = _col.query(query_embeddings=[vector], n_results=TOP_K, include=["documents", "metadatas"])
+    results = col.query(query_embeddings=[vector], n_results=TOP_K, include=["documents", "metadatas"])
 
     parts = []
     for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0]), 1):
