@@ -54,7 +54,7 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
 # ── Retrieval helper ──────────────────────────────────────────────────────────
 
 def retrieve(query: str) -> str:
-    """Embed query, fetch top-k chunks, return formatted context string."""
+    
     docs = retriever.invoke(query)
     if not docs:
         return "No relevant context found."
