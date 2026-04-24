@@ -11,9 +11,9 @@ from tools import TOOL_SCHEMA, get_epa_facilities
 load_dotenv()
 
 
-CHROMA_DIR = "./chroma_db"
-COLLECTION = "ecolab_corpus"
-TOP_K = 5
+#CHROMA_DIR = "./chroma_db"
+#COLLECTION = "ecolab_corpus"
+#TOP_K = 5
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
@@ -24,8 +24,8 @@ client = AzureOpenAI(
 )
 
 # ChromaDB — opened once at import time
-db = chromadb.PersistentClient(path=CHROMA_DIR)
-col = db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
+db = chromadb.PersistentClient(path=os.environ["CHROMA_DIR"])
+col = db.get_or_create_collection(os.environ["COLLECTION"], metadata={"hnsw:space": "cosine"})
 
 
 # ── Retrieval ─────────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ col = db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
 def retrieve(query: str) -> str:
     """Embed query, fetch top-k chunks, return formatted context string."""
     vector = client.embeddings.create(model=EMBEDDING_MODEL, input=query).data[0].embedding
-    results = col.query(query_embeddings=[vector], n_results=TOP_K, include=["documents", "metadatas"])
+    results = col.query(query_embeddings=[vector], n_results=os.environ["TOP_K"], include=["documents", "metadatas"])
 
     parts = []
     for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0]), 1):
