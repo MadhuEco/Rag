@@ -33,7 +33,7 @@ col = db.get_or_create_collection(os.environ["COLLECTION"], metadata={"hnsw:spac
 def retrieve(query: str) -> str:
     """Embed query, fetch top-k chunks, return formatted context string."""
     vector = client.embeddings.create(model=EMBEDDING_MODEL, input=query).data[0].embedding
-    results = col.query(query_embeddings=[vector], n_results=os.environ["TOP_K"], include=["documents", "metadatas"])
+    results = col.query(query_embeddings=[vector], n_results=int(os.environ["TOP_K"]), include=["documents", "metadatas"])
 
     parts = []
     for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0]), 1):

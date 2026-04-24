@@ -42,12 +42,12 @@ def load_file(path: Path) -> str:
 
 def chunk_text(text: str) -> list[str]:
     tokens = enc.encode(text)
-    step = os.environ["CHUNK_SIZE"] - os.environ["CHUNK_OVERLAP"]
+    step = int(os.environ["CHUNK_SIZE"]) - int(os.environ["CHUNK_OVERLAP"])
     chunks = []
     for start in range(0, len(tokens), step):
-        chunk = enc.decode(tokens[start : start + os.environ["CHUNK_SIZE"]])
+        chunk = enc.decode(tokens[start : start + int(os.environ["CHUNK_SIZE"])])
         chunks.append(chunk)
-        if start + os.environ["CHUNK_SIZE"] >= len(tokens):
+        if start + int(os.environ["CHUNK_SIZE"]) >= len(tokens):
             break
     return chunks
 
@@ -63,7 +63,7 @@ def embed(texts: list[str]) -> list[list[float]]:
 
 def main():
     supported = {".pdf", ".txt", ".md"}
-    files = [f for f in sorted(os.environ["CORPUS_DIR"].glob("**/*")) if f.suffix in supported]
+    files = [f for f in sorted(Path(os.environ["CORPUS_DIR"]).glob("**/*")) if f.suffix in supported]
 
     if not files:
         print(f"No documents found in {os.environ["CORPUS_DIR"]}. Add .pdf / .txt files.")
