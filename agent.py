@@ -3,9 +3,10 @@ import os
 from datetime import date, timedelta
 
 import chromadb
-import requests
 from dotenv import load_dotenv
 from openai import AzureOpenAI
+from tools import TOOL_SCHEMA, get_epa_facilities
+
 
 load_dotenv()
 
@@ -41,104 +42,8 @@ def retrieve(query: str) -> str:
     return "\n\n".join(parts) if parts else "No relevant context found."
 
 
-# ── Tool: USGS Water Quality ──────────────────────────────────────────────────
-
-TOOL_SCHEMA = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_epa_facilities",
-            "description": (
-                "Fetch EPA-regulated facility information from the EPA Facility Registry "
-                "Service (FRS) for a given US ZIP code. Use when the user asks about "
-                "nearby EPA facilities, Superfund sites, or regulated locations at a "
-                "specific ZIP code. Do NOT call for general conceptual questions."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "zip_code": {
-                        "type": "string",
-                        "description": "US ZIP code to search, e.g. '60085', '77001'.",
-                    },
-                    "pgm_sys_acrnm": {
-                        "type": "string",
-                        "description": (
-                            "EPA program system acronym to filter by. "
-                            "Common values: 'SEMS' (Superfund, default), "
-                            "'RCRAINFO' (hazardous waste), 'ICIS-AIR' (air emissions), "
-                            "'NPDES' (water discharge permits), 'TRIS' (toxic release inventory)."
-                        ),
-                    },
-                    "program_output": {
-                        "type": "string",
-                        "description": "Include linked EPA program details. 'yes' or 'no'. Defaults to 'yes'.",
-                    },
-                },
-                "required": ["zip_code"],
-            },
-        },
-    }
-]
 
 
-def get_water_quality(state_code: str, characteristic_name: str = "") -> str:
-    since = (date.today() - timedelta(days=365)).strftime("%m-%d-%Y")
-    params = {
-        "statecode": f"US:{state_code.upper()}",
-        "mimeType": "json",
-        "sorted": "yes",
-        "startDateLo": since,
-        "dataProfile": "resultPhysChem",
-        "pageSize": 5,
-        "pageNumber": 1,
-    }
-    if characteristic_name:
-        params["characteristicName"] = characteristic_name
-
-    try:
-        r = requests.get("https://www.waterqualitydata.us/data/Result/search", params=params, timeout=15)
-        r.raise_for_status()
-        data = r.json()
-    except Exception as e:
-        return f"Error fetching water quality data: {e}"
-
-    if not data:
-        return f"No results found for {state_code}" + (f" / {characteristic_name}" if characteristic_name else "") + "."
-
-    lines = [f"USGS Water Quality — {state_code.upper()} ({characteristic_name or 'all parameters'})\n"]
-    for i, row in enumerate(data[:5], 1):
-        lines.append(
-            f"{i}. [{row.get('ActivityStartDate', 'N/A')}] "
-            f"{row.get('CharacteristicName', 'N/A')}: "
-            f"{row.get('ResultMeasureValue', 'N/A')} "
-            f"{row.get('ResultMeasure/MeasureUnitCode', '')}  "
-            f"(site: {row.get('MonitoringLocationIdentifier', 'N/A')})"
-        )
-    return "\n".join(lines)
-
-EPA_FRS_URL = "https://frs-public.epa.gov/ords/frs_public2/frs_rest_services.get_facilities"
-def get_epa_facilities(
-    zip_code: str,
-    pgm_sys_acrnm: str = "SEMS",
-    program_output: str = "yes",
-) -> str:
-    params = {
-        "pgm_sys_acrnm": pgm_sys_acrnm.upper(),
-        "zip_code": zip_code.strip(),
-        "program_output": program_output,
-        "output": "JSON",
-    }
-
-    try:
-        r = requests.get(EPA_FRS_URL, params=params, timeout=30, verify=False)
-        r.raise_for_status()
-        data = r.json()
-    except Exception as e:
-        return f"Error fetching EPA FRS data: {e}"
-
-    data = json.dumps(data)
-    return data
 
 # ── Agent loop ────────────────────────────────────────────────────────────────
 

@@ -10,11 +10,11 @@ from openai import AzureOpenAI
 load_dotenv()
 
 
-CORPUS_DIR = Path("data/raw")
-CHROMA_DIR = "./chroma_db"
-COLLECTION = "ecolab_corpus"
-CHUNK_SIZE = 512    # tokens
-CHUNK_OVERLAP = 64  # tokens
+# CORPUS_DIR = Path("data/raw")
+# CHROMA_DIR = "./chroma_db"
+# COLLECTION = "ecolab_corpus"
+# CHUNK_SIZE = 512    # tokens
+# CHUNK_OVERLAP = 64  # tokens
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
 client = AzureOpenAI(
@@ -34,13 +34,6 @@ def load_file(path: Path) -> str:
         pages = [p.extract_text() or "" for p in PdfReader(str(path)).pages]
         return "\n\n".join(pages)
 
-    # if path.suffix in (".html", ".htm"):
-    #     from bs4 import BeautifulSoup
-    #     soup = BeautifulSoup(path.read_text(encoding="utf-8", errors="replace"), "html.parser")
-    #     for tag in soup(["script", "style", "nav", "footer"]):
-    #         tag.decompose()
-    #     text = soup.get_text(separator="\n")
-    #     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
     return path.read_text(encoding="utf-8", errors="replace")
 
@@ -49,12 +42,12 @@ def load_file(path: Path) -> str:
 
 def chunk_text(text: str) -> list[str]:
     tokens = enc.encode(text)
-    step = CHUNK_SIZE - CHUNK_OVERLAP
+    step = os.environ["CHUNK_SIZE"] - os.environ["CHUNK_OVERLAP"]
     chunks = []
     for start in range(0, len(tokens), step):
-        chunk = enc.decode(tokens[start : start + CHUNK_SIZE])
+        chunk = enc.decode(tokens[start : start + os.environ["CHUNK_SIZE"]])
         chunks.append(chunk)
-        if start + CHUNK_SIZE >= len(tokens):
+        if start + os.environ["CHUNK_SIZE"] >= len(tokens):
             break
     return chunks
 
@@ -70,10 +63,10 @@ def embed(texts: list[str]) -> list[list[float]]:
 
 def main():
     supported = {".pdf", ".txt", ".md"}
-    files = [f for f in sorted(CORPUS_DIR.glob("**/*")) if f.suffix in supported]
+    files = [f for f in sorted(os.environ["CORPUS_DIR"].glob("**/*")) if f.suffix in supported]
 
     if not files:
-        print(f"No documents found in {CORPUS_DIR}. Add .pdf / .txt files.")
+        print(f"No documents found in {os.environ["CORPUS_DIR"]}. Add .pdf / .txt files.")
         return
 
     print(f"Found {len(files)} file(s). Loading and chunking...")
@@ -91,9 +84,9 @@ def main():
     print(f"\nEmbedding {len(all_chunks)} chunk(s)...")
     embeddings = embed(all_chunks)
 
-    print(f"Storing in ChromaDB at {CHROMA_DIR}...")
-    db = chromadb.PersistentClient(path=CHROMA_DIR)
-    col = db.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
+    print(f"Storing in ChromaDB at {os.environ["CHROMA_DIR"]}...")
+    db = chromadb.PersistentClient(path=os.environ["CHROMA_DIR"])
+    col = db.get_or_create_collection(os.environ["COLLECTION"], metadata={"hnsw:space": "cosine"})
     col.upsert(ids=all_ids, embeddings=embeddings, documents=all_chunks, metadatas=all_meta)
 
     print(f"Done. Collection has {col.count()} chunk(s) total.")
