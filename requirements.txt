@@ -6,3 +6,4 @@ tiktoken
 pypdf
 beautifulsoup4
 streamlit
+pytest

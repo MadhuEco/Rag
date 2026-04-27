@@ -10,11 +10,7 @@ from openai import AzureOpenAI
 load_dotenv()
 
 
-# CORPUS_DIR = Path("data/raw")
-# CHROMA_DIR = "./chroma_db"
-# COLLECTION = "ecolab_corpus"
-# CHUNK_SIZE = 512    # tokens
-# CHUNK_OVERLAP = 64  # tokens
+
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
 client = AzureOpenAI(

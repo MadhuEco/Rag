@@ -11,9 +11,7 @@ from tools import TOOL_SCHEMA, get_epa_facilities
 load_dotenv()
 
 
-#CHROMA_DIR = "./chroma_db"
-#COLLECTION = "ecolab_corpus"
-#TOP_K = 5
+
 CHAT_MODEL = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.4-nano")
 EMBEDDING_MODEL = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
