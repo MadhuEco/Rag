@@ -5,6 +5,8 @@ from datetime import date, timedelta
 import chromadb
 from dotenv import load_dotenv
 from openai import AzureOpenAI
+
+
 from tools import TOOL_SCHEMA, get_epa_facilities
 
 
