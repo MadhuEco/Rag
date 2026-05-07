@@ -1,4 +1,4 @@
-# Ecolab RAG Agent
+# Ecolab RAG Agent 
 
 An intelligent conversational assistant for Ecolab's domains — **water treatment**, **hygiene**, and **sustainability** — powered by Retrieval-Augmented Generation (RAG). The agent answers questions by searching a private document corpus and can look up real-time EPA facility data for any US ZIP code.
 
