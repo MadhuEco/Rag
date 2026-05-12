@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Buying coffee with a contactless card" id="id-coffee-ex1" version="5.0.0">
+  <folder name="Strategy" id="id-697faf34caa54b0a8dc3333239a18346" type="strategy"/>
+  <folder name="Business" id="folder-business" type="business">
+    <element xsi:type="archimate:BusinessActor" name="Customer" id="ba-customer"/>
+    <element xsi:type="archimate:BusinessActor" name="Barista" id="ba-barista"/>
+    <element xsi:type="archimate:BusinessActor" name="Payment Network" id="ba-payment-network"/>
+    <element xsi:type="archimate:BusinessService" name="Coffee Purchase Service" id="bsvc-coffee-purchase"/>
+    <element xsi:type="archimate:BusinessService" name="Payment Authorisation Service" id="bsvc-payment-auth"/>
+    <element xsi:type="archimate:BusinessProcess" name="Order and Pay" id="bproc-order-and-pay"/>
+    <element xsi:type="archimate:BusinessObject" name="Payment Transaction" id="bobj-payment-transaction"/>
+    <element xsi:type="archimate:BusinessObject" name="Coffee Order" id="bobj-coffee-order"/>
+  </folder>
+  <folder name="Application" id="folder-application" type="application">
+    <element xsi:type="archimate:ApplicationComponent" name="POS Application" id="ac-pos-app"/>
+    <element xsi:type="archimate:ApplicationComponent" name="Payment Gateway App" id="ac-payment-gateway"/>
+    <element xsi:type="archimate:ApplicationService" name="Take Payment Service" id="asvc-take-payment"/>
+    <element xsi:type="archimate:DataObject" name="Transaction Record" id="do-transaction-record"/>
+  </folder>
+  <folder name="Technology" id="folder-technology" type="technology">
+    <element xsi:type="archimate:Device" name="NFC Card Reader" id="dev-nfc-reader"/>
+    <element xsi:type="archimate:Node" name="POS Terminal Server" id="node-pos-server"/>
+    <element xsi:type="archimate:TechnologyService" name="Network Communication Service" id="tsvc-network-comm"/>
+  </folder>
+  <folder name="Motivation" id="id-0bd35cacb4854e17a4f1a4a93f9a817b" type="motivation"/>
+  <folder name="Implementation &amp; Migration" id="id-88b4dc0332594891b65c4ab1ed96613f" type="implementation_migration"/>
+  <folder name="Other" id="id-48e14e8c105b4168bf1457fbede0f4ae" type="other"/>
+  <folder name="Relations" id="folder-relations" type="relations">
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-01" source="ba-customer" target="bsvc-coffee-purchase"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-02" source="ba-barista" target="bsvc-coffee-purchase"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-03" source="ba-payment-network" target="bsvc-payment-auth"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-04" source="bsvc-coffee-purchase" target="bproc-order-and-pay"/>
+    <element xsi:type="archimate:TriggeringRelationship" id="rel-05" source="bproc-order-and-pay" target="bsvc-payment-auth"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-06" source="bproc-order-and-pay" target="bobj-coffee-order" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-07" source="bproc-order-and-pay" target="bobj-payment-transaction" directed="true"/>
+    <element xsi:type="archimate:RealizationRelationship" id="rel-08" source="ac-pos-app" target="bsvc-coffee-purchase"/>
+    <element xsi:type="archimate:RealizationRelationship" id="rel-09" source="ac-payment-gateway" target="bsvc-payment-auth"/>
+    <element xsi:type="archimate:RealizationRelationship" id="rel-10" source="ac-pos-app" target="asvc-take-payment"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-11" source="asvc-take-payment" target="bproc-order-and-pay"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-12" source="ac-payment-gateway" target="ac-pos-app"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-13" source="do-transaction-record" target="bobj-payment-transaction" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-14" source="ac-payment-gateway" target="do-transaction-record" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-15" source="dev-nfc-reader" target="ac-pos-app" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-16" source="node-pos-server" target="ac-pos-app" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-17" source="node-pos-server" target="ac-payment-gateway" directed="true"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-18" source="tsvc-network-comm" target="ac-payment-gateway"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-19" source="tsvc-network-comm" target="ba-payment-network"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-20" source="node-pos-server" target="tsvc-network-comm"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-21" source="dev-nfc-reader" target="node-pos-server" directed="true"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-2d39a5f78d9d4210a9100e9e88ddf7a5" source="bsvc-payment-auth" target="bobj-coffee-order"/>
+  </folder>
+  <folder name="Views" id="folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="New ArchiMate View" id="id-af1b06bad3d543d88f4fd65fe83fed86">
+      <child xsi:type="archimate:DiagramObject" id="id-e10814dffc5d48c994bf1ead64e8a41b" archimateElement="ba-barista">
+        <bounds x="420" y="120" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-403a1fd1fb2a4f9c8f86387db8712df4" source="id-e10814dffc5d48c994bf1ead64e8a41b" target="id-41873a2bd7ee479ab7a3a013d6612df2" archimateRelationship="rel-02"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-73debfffc48f41fcb76fc132cfb87ecf" archimateElement="ba-customer">
+        <bounds x="204" y="120" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-d462a824d5af4b13a98922f9e3707905" source="id-73debfffc48f41fcb76fc132cfb87ecf" target="id-41873a2bd7ee479ab7a3a013d6612df2" archimateRelationship="rel-01"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-41873a2bd7ee479ab7a3a013d6612df2" targetConnections="id-d462a824d5af4b13a98922f9e3707905 id-403a1fd1fb2a4f9c8f86387db8712df4 id-1cd63e5e04834a44b18b071ecb41ad2a" archimateElement="bsvc-coffee-purchase">
+        <bounds x="180" y="240" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-df395929ef3c445cb899e89c9932c8ba" source="id-41873a2bd7ee479ab7a3a013d6612df2" target="id-89fc6e8ad9d547f7b67b1a4f1239863c" archimateRelationship="rel-04"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-b9a47466eff1408c8c84e85cc04ec491" targetConnections="id-ccee285e013c41029a58968d7cf89678 id-7876a0ec70cc42d4b77dd960279f0fcc id-d4095d9756a04ccf9ce798081cd64da5" archimateElement="bsvc-payment-auth">
+        <bounds x="420" y="228" width="120" height="55"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-89fc6e8ad9d547f7b67b1a4f1239863c" targetConnections="id-df395929ef3c445cb899e89c9932c8ba id-7e442064245f4986b0f306509efd7099" archimateElement="bproc-order-and-pay">
+        <bounds x="180" y="336" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-ccee285e013c41029a58968d7cf89678" source="id-89fc6e8ad9d547f7b67b1a4f1239863c" target="id-b9a47466eff1408c8c84e85cc04ec491" archimateRelationship="rel-05"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-29e09a5f4c5e4abc82a00d57ab44038f" source="id-89fc6e8ad9d547f7b67b1a4f1239863c" target="id-b5215b1421da48f4877ec579fe833550" archimateRelationship="rel-06"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-4b62faceb56c4ede860fd51f430dd757" source="id-89fc6e8ad9d547f7b67b1a4f1239863c" target="id-f6f394c77b814150b1937adecbd7bfef" archimateRelationship="rel-07"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-b5215b1421da48f4877ec579fe833550" targetConnections="id-29e09a5f4c5e4abc82a00d57ab44038f" archimateElement="bobj-coffee-order">
+        <bounds x="672" y="336" width="120" height="55"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-e50527eb62484ff8a39b856da6fbfe77" targetConnections="id-d768c802992f48fda04cc4de0a516d1b" archimateElement="ba-payment-network">
+        <bounds x="768" y="108" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-7876a0ec70cc42d4b77dd960279f0fcc" source="id-e50527eb62484ff8a39b856da6fbfe77" target="id-b9a47466eff1408c8c84e85cc04ec491" archimateRelationship="rel-03"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-f6f394c77b814150b1937adecbd7bfef" targetConnections="id-4b62faceb56c4ede860fd51f430dd757 id-aff7d7996c1c4d67bc691f4b1d4d0870" archimateElement="bobj-payment-transaction">
+        <bounds x="468" y="324" width="120" height="55"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-1af40f0fe6304b5685eceb504b0b3df6" targetConnections="id-971a94ef56a94bfba6e9d98499b89864 id-5290ede1ee77441fae065d8c350211f4 id-6e934bc5ea81450eb04305b86ed762e8" archimateElement="ac-pos-app">
+        <bounds x="228" y="480" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-1cd63e5e04834a44b18b071ecb41ad2a" source="id-1af40f0fe6304b5685eceb504b0b3df6" target="id-41873a2bd7ee479ab7a3a013d6612df2" archimateRelationship="rel-08"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-0070e6107b7f4c42b73a4ad53b162397" source="id-1af40f0fe6304b5685eceb504b0b3df6" target="id-b59402be56d24cfb96f2352d1b0c975e" archimateRelationship="rel-10"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-c703345b4c27487ba94c015c333ea150" targetConnections="id-8b3a17129be64160b59cd06cef832099 id-55dbd3ba201242a9a5134734113a98c0" archimateElement="ac-payment-gateway">
+        <bounds x="616" y="480" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-d4095d9756a04ccf9ce798081cd64da5" source="id-c703345b4c27487ba94c015c333ea150" target="id-b9a47466eff1408c8c84e85cc04ec491" archimateRelationship="rel-09"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-971a94ef56a94bfba6e9d98499b89864" source="id-c703345b4c27487ba94c015c333ea150" target="id-1af40f0fe6304b5685eceb504b0b3df6" archimateRelationship="rel-12"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-6b20b30d52be4eb59bf8b9b34c1c442d" source="id-c703345b4c27487ba94c015c333ea150" target="id-1978de3fed78470abf602d051f8539c0" archimateRelationship="rel-14"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-b59402be56d24cfb96f2352d1b0c975e" targetConnections="id-0070e6107b7f4c42b73a4ad53b162397" archimateElement="asvc-take-payment">
+        <bounds x="204" y="576" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-7e442064245f4986b0f306509efd7099" source="id-b59402be56d24cfb96f2352d1b0c975e" target="id-89fc6e8ad9d547f7b67b1a4f1239863c" archimateRelationship="rel-11"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-1978de3fed78470abf602d051f8539c0" targetConnections="id-6b20b30d52be4eb59bf8b9b34c1c442d" archimateElement="do-transaction-record">
+        <bounds x="444" y="576" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-aff7d7996c1c4d67bc691f4b1d4d0870" source="id-1978de3fed78470abf602d051f8539c0" target="id-f6f394c77b814150b1937adecbd7bfef" archimateRelationship="rel-13"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-0a8df9b3e3f541f58f98e5a392e1291d" archimateElement="dev-nfc-reader">
+        <bounds x="192" y="708" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-5290ede1ee77441fae065d8c350211f4" source="id-0a8df9b3e3f541f58f98e5a392e1291d" target="id-1af40f0fe6304b5685eceb504b0b3df6" archimateRelationship="rel-15"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-c417b73ec8f549f68e8578dfbc573945" source="id-0a8df9b3e3f541f58f98e5a392e1291d" target="id-1956dea17c34466d8c3f162627f42379" archimateRelationship="rel-21"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-1956dea17c34466d8c3f162627f42379" targetConnections="id-c417b73ec8f549f68e8578dfbc573945" archimateElement="node-pos-server">
+        <bounds x="539" y="708" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-8b3a17129be64160b59cd06cef832099" source="id-1956dea17c34466d8c3f162627f42379" target="id-c703345b4c27487ba94c015c333ea150" archimateRelationship="rel-17"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-6e934bc5ea81450eb04305b86ed762e8" source="id-1956dea17c34466d8c3f162627f42379" target="id-1af40f0fe6304b5685eceb504b0b3df6" archimateRelationship="rel-16"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-b0920d1a81964dbda75d3ec84923242c" source="id-1956dea17c34466d8c3f162627f42379" target="id-63a84c10d1a94f0eb9c989f535450204" archimateRelationship="rel-20"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-63a84c10d1a94f0eb9c989f535450204" targetConnections="id-b0920d1a81964dbda75d3ec84923242c" archimateElement="tsvc-network-comm">
+        <bounds x="792" y="708" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-55dbd3ba201242a9a5134734113a98c0" source="id-63a84c10d1a94f0eb9c989f535450204" target="id-c703345b4c27487ba94c015c333ea150" archimateRelationship="rel-18"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-d768c802992f48fda04cc4de0a516d1b" source="id-63a84c10d1a94f0eb9c989f535450204" target="id-e50527eb62484ff8a39b856da6fbfe77" archimateRelationship="rel-19"/>
+      </child>
+    </element>
+  </folder>
+</archimate:model>
