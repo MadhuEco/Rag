@@ -163,6 +163,18 @@
     <element xsi:type="archimate:FlowRelationship" id="r-t23" source="t-node-graph" target="t-node-semantic-idx"/>
     <element xsi:type="archimate:FlowRelationship" id="r-t24" source="t-node-semantic-idx" target="t-node-aoai"/>
     <element xsi:type="archimate:FlowRelationship" id="r-t26" source="t-node-copilot-studio" target="t-node-purview"/>
+    <element xsi:type="archimate:FlowRelationship" id="id-31309ba918e0477995d5048ef854beb6" source="t-svc-teams-channel" target="t-node-copilot-studio"/>
+    <element xsi:type="archimate:FlowRelationship" id="id-f8bfc9c65b044987b76130225b397cec" source="t-svc-oauth" target="t-node-copilot-studio"/>
+    <element xsi:type="archimate:FlowRelationship" id="id-e87700423f4b4a2e9e6ec1dd069aefc5" source="t-node-teams" target="t-node-copilot-studio"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-640371c557694b269ea7a35be989d140" source="t-node-copilot-studio" target="t-art-manifest"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-8806aaf15fef455aaa8689172803cb2a" source="t-art-schema" target="t-node-graph"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="id-1ece489fa00648dca87ef22fbf37792f" source="t-node-copilot-studio" target="t-art-manifest"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="id-3ba0d02a0f35477d98cb2571e35c5adb" source="b-act-frontline" target="b-proc-ask"/>
+    <element xsi:type="archimate:AccessRelationship" id="id-7da29f3be071479b9e720bf1bb97d410" source="b-svc-answer" target="b-obj-answer"/>
+    <element xsi:type="archimate:ServingRelationship" id="id-da0658e882aa4111b897eefa9c9adfa3" source="a-comp-agent" target="b-svc-answer"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-2b4e234b807c4b2590e9f5301f4f92e9" source="a-comp-idp" target="t-svc-oauth"/>
+    <element xsi:type="archimate:ServingRelationship" id="id-f11f25cd0d104f8d93b1b1dcb00f443a" source="t-svc-oauth" target="a-comp-idp"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-753135eae7af41fc8f4e8980b108fb2a" source="t-svc-runtime" target="a-comp-agent"/>
   </folder>
   <folder name="Views" id="id-8a5bf73f2ed84d4a9779ba12c662e4f4" type="diagrams">
     <element xsi:type="archimate:ArchimateDiagramModel" name="motivation" id="id-c5baf2a8194d442cab0bbc507843ce76">
@@ -256,6 +268,15 @@
       </child>
     </element>
     <element xsi:type="archimate:ArchimateDiagramModel" name="application" id="id-2e00f6d9b8264e4eaf126349031d65e9">
+      <child xsi:type="archimate:Group" id="id-8649134c44394fc8a31f25caa8eae044" name="Application Services" textAlignment="1">
+        <bounds x="45" y="479" width="755" height="107"/>
+      </child>
+      <child xsi:type="archimate:Group" id="id-43ba4be5fd1649129a4193599ad50af1" name="Composed Inside Copilot Studio agent" textAlignment="1">
+        <bounds x="355" y="336" width="489" height="118"/>
+      </child>
+      <child xsi:type="archimate:Group" id="id-bc748bcc9d5a4b18b76f78a06b9a7852" name="Indexing Pipeline" textAlignment="1">
+        <bounds x="47" y="11" width="562" height="143"/>
+      </child>
       <child xsi:type="archimate:DiagramObject" id="id-9dc0bef7dd9d4ed1b2209586deac4464" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-sp">
         <bounds x="72" y="48" width="120" height="55"/>
       </child>
@@ -298,13 +319,13 @@
         <sourceConnection xsi:type="archimate:Connection" id="id-071e0eb9772e401e976eae1c7c6a3c89" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-472469cabe114504a4ab96d9edf32dd8" target="id-df41c17d66ec4588856b7461a813a0ac" archimateRelationship="r-a04"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-881055f9d3034410815bec8ee1ae2e6f" targetConnections="id-4f9c74742d7c48a9b5113712ae08341a" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-topic">
-        <bounds x="396" y="348" width="120" height="55"/>
+        <bounds x="396" y="372" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-dcb5be9522354b87a90b66616e842163" targetConnections="id-2655f73c18a141599c62a6da4db806a4" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-fn-dialog">
-        <bounds x="540" y="360" width="120" height="55"/>
+        <bounds x="540" y="372" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-b38335dd9974426dbfc4017d90193b26" targetConnections="id-c9ec0f31291f4bb9b4b66d7dc07dff17" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-fn-cite">
-        <bounds x="719" y="360" width="120" height="55"/>
+        <bounds x="719" y="372" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-8d0c7f95bf0a47f7955651b08ed80192" targetConnections="id-9eb64db06a124a6fa600dcb6f7b4acae" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-svc-conversation">
         <bounds x="72" y="504" width="120" height="55"/>
@@ -337,30 +358,33 @@
     <element xsi:type="archimate:ArchimateDiagramModel" name="layered" id="id-b6ac6a6136fc435a824e3262f1b476e4">
       <child xsi:type="archimate:DiagramObject" id="id-4442dfc8c9374a8686a378529f705a70" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-act-frontline">
         <bounds x="60" y="36" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-c3a968f241da404abb8deeb79a2de11f" source="id-4442dfc8c9374a8686a378529f705a70" target="id-f497abe559d24266ae2cedc75ec12cdc" archimateRelationship="id-3ba0d02a0f35477d98cb2571e35c5adb"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-f497abe559d24266ae2cedc75ec12cdc" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-proc-ask">
+      <child xsi:type="archimate:DiagramObject" id="id-f497abe559d24266ae2cedc75ec12cdc" targetConnections="id-c3a968f241da404abb8deeb79a2de11f" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-proc-ask">
         <bounds x="252" y="36" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-9e2836e34cf4481cafb1bb91de0b1b28" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-f497abe559d24266ae2cedc75ec12cdc" target="id-59661b48780e4850bc532c5020fb8573" archimateRelationship="r-b05"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-59661b48780e4850bc532c5020fb8573" targetConnections="id-9e2836e34cf4481cafb1bb91de0b1b28" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-svc-answer">
+      <child xsi:type="archimate:DiagramObject" id="id-59661b48780e4850bc532c5020fb8573" targetConnections="id-9e2836e34cf4481cafb1bb91de0b1b28 id-5bd1db3e8a37476099cd4392ad2418b6" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-svc-answer">
         <bounds x="456" y="36" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-6e3cbf7ae270417fafc3e819718a5a9f" source="id-59661b48780e4850bc532c5020fb8573" target="id-72007ac536c04ff9963a8dca42c55e87" archimateRelationship="id-7da29f3be071479b9e720bf1bb97d410"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-72007ac536c04ff9963a8dca42c55e87" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-obj-answer">
-        <bounds x="600" y="36" width="120" height="55"/>
+      <child xsi:type="archimate:DiagramObject" id="id-72007ac536c04ff9963a8dca42c55e87" targetConnections="id-6e3cbf7ae270417fafc3e819718a5a9f" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#ffffb5" archimateElement="b-obj-answer">
+        <bounds x="660" y="36" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-5785e91268f543f49b0f0d588ff80622" targetConnections="id-7dc54cd35cd44b5d809d23be6f29e7ef id-85f12601032540a3ae7ba211313e0968" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-teams-adapter">
         <bounds x="60" y="192" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-f3675f3f502142fdad12118fd892cd99" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-5785e91268f543f49b0f0d588ff80622" target="id-67759d3ac74c4461b8e8bdbcbb889aea" archimateRelationship="r-a10"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-d39c6cd2f38040bdb879c13e99911fba" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-5785e91268f543f49b0f0d588ff80622" target="id-c8b02d4943744ce5b28924919b7ca894" archimateRelationship="r-a15"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-67759d3ac74c4461b8e8bdbcbb889aea" targetConnections="id-f3675f3f502142fdad12118fd892cd99" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-idp">
+      <child xsi:type="archimate:DiagramObject" id="id-67759d3ac74c4461b8e8bdbcbb889aea" targetConnections="id-f3675f3f502142fdad12118fd892cd99 id-af350255599644f185f8cab958be0b6e" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-idp">
         <bounds x="264" y="150" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-0ec2abd606b24ddf8e8b8e3a128bf5c5" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-67759d3ac74c4461b8e8bdbcbb889aea" target="id-c8b02d4943744ce5b28924919b7ca894" archimateRelationship="r-a11"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-c8b02d4943744ce5b28924919b7ca894" targetConnections="id-d39c6cd2f38040bdb879c13e99911fba id-0ec2abd606b24ddf8e8b8e3a128bf5c5 id-df688e984dc44ea5b10f3b21e36db9fd" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-agent">
+      <child xsi:type="archimate:DiagramObject" id="id-c8b02d4943744ce5b28924919b7ca894" targetConnections="id-d39c6cd2f38040bdb879c13e99911fba id-0ec2abd606b24ddf8e8b8e3a128bf5c5 id-df688e984dc44ea5b10f3b21e36db9fd id-e501d6a98d07470ea69e15c43fa26c2a" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-agent">
         <bounds x="492" y="204" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-7dc54cd35cd44b5d809d23be6f29e7ef" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-c8b02d4943744ce5b28924919b7ca894" target="id-5785e91268f543f49b0f0d588ff80622" archimateRelationship="id-12b25a5e6f664cb29d3e9e3e111f3001"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-a7d498c07dac459d83fbd8da4e665aec" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-c8b02d4943744ce5b28924919b7ca894" target="id-792bb9451b9d4f12bc290de8e4b9a028" archimateRelationship="r-a12"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-5bd1db3e8a37476099cd4392ad2418b6" source="id-c8b02d4943744ce5b28924919b7ca894" target="id-59661b48780e4850bc532c5020fb8573" archimateRelationship="id-da0658e882aa4111b897eefa9c9adfa3"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-239da1bd42254300a4a7384a48ae01ab" targetConnections="id-7cc8ffac9a134b19a305ed163c396e7a id-bc558258ab7e425494bd94c64db4cd55" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-do-index-entry">
         <bounds x="660" y="204" width="120" height="55"/>
@@ -374,7 +398,7 @@
         <sourceConnection xsi:type="archimate:Connection" id="id-7cc8ffac9a134b19a305ed163c396e7a" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-048d6517413b4dd785515b0297093239" target="id-239da1bd42254300a4a7384a48ae01ab" archimateRelationship="r-a18"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-2fa64bee652a4bf6b20b6249e8d54948" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-048d6517413b4dd785515b0297093239" target="id-792bb9451b9d4f12bc290de8e4b9a028" archimateRelationship="id-2f577dbe58e74acb86403bd46d0dd61f"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-792bb9451b9d4f12bc290de8e4b9a028" targetConnections="id-a7d498c07dac459d83fbd8da4e665aec id-2fa64bee652a4bf6b20b6249e8d54948 id-b268891cd51f40fe908c70f004bd7d7f" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-semantic-index">
+      <child xsi:type="archimate:DiagramObject" id="id-792bb9451b9d4f12bc290de8e4b9a028" targetConnections="id-a7d498c07dac459d83fbd8da4e665aec id-2fa64bee652a4bf6b20b6249e8d54948 id-6947423a894f480a9888eb5b607a475f" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#b5ffff" archimateElement="a-comp-semantic-index">
         <bounds x="324" y="324" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-bc558258ab7e425494bd94c64db4cd55" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-792bb9451b9d4f12bc290de8e4b9a028" target="id-239da1bd42254300a4a7384a48ae01ab" archimateRelationship="r-a19"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-df2eea736f034c14a7488bc1328be767" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-792bb9451b9d4f12bc290de8e4b9a028" target="id-f391666865174dd5a864d67f5245922f" archimateRelationship="r-a16"/>
@@ -385,12 +409,14 @@
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-2d3bd0f8a7614ad892f33e18bd751e29" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-svc-oauth">
         <bounds x="203" y="456" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-af350255599644f185f8cab958be0b6e" source="id-2d3bd0f8a7614ad892f33e18bd751e29" target="id-67759d3ac74c4461b8e8bdbcbb889aea" archimateRelationship="id-f11f25cd0d104f8d93b1b1dcb00f443a"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-2d91fb388d554719bfae822f912029ea" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-svc-runtime">
-        <bounds x="383" y="456" width="120" height="55"/>
+        <bounds x="407" y="456" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-e501d6a98d07470ea69e15c43fa26c2a" source="id-2d91fb388d554719bfae822f912029ea" target="id-c8b02d4943744ce5b28924919b7ca894" archimateRelationship="id-753135eae7af41fc8f4e8980b108fb2a"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-3fd09250e1244bd084754c7ad8f8278e" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-purview">
-        <bounds x="541" y="456" width="120" height="55"/>
+        <bounds x="600" y="456" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-1e3bcee9d33642c2968de01fa9a40ef7" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-sp">
         <bounds x="48" y="564" width="120" height="55"/>
@@ -403,58 +429,71 @@
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-aced59e13424421f95ad8530bef0cc3a" targetConnections="id-7c6e1636c02444428660100d8bd9d3af" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-semantic-idx">
         <bounds x="516" y="576" width="120" height="55"/>
-        <sourceConnection xsi:type="archimate:Connection" id="id-b268891cd51f40fe908c70f004bd7d7f" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-aced59e13424421f95ad8530bef0cc3a" target="id-792bb9451b9d4f12bc290de8e4b9a028" archimateRelationship="id-ddf4413a604f44189309ecfc3ca29459"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-d6ea77eeed3040dab950e998ff706c87" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-aced59e13424421f95ad8530bef0cc3a" target="id-c2c7ae252625413a9c17e514d19270e3" archimateRelationship="r-t24"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-6947423a894f480a9888eb5b607a475f" source="id-aced59e13424421f95ad8530bef0cc3a" target="id-792bb9451b9d4f12bc290de8e4b9a028" archimateRelationship="id-ddf4413a604f44189309ecfc3ca29459"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-c2c7ae252625413a9c17e514d19270e3" targetConnections="id-d6ea77eeed3040dab950e998ff706c87" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-aoai">
         <bounds x="48" y="648" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-1e2f193f853a46d8a8d466feca1a6caa" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-c2c7ae252625413a9c17e514d19270e3" target="id-f391666865174dd5a864d67f5245922f" archimateRelationship="id-621cfaaf467e4d24bb4aa931f423477a"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-731781685c084d88a11069273ac5c8c4" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-pp">
-        <bounds x="276" y="672" width="120" height="55"/>
-      </child>
     </element>
     <element xsi:type="archimate:ArchimateDiagramModel" name="technology" id="id-109df02928084560b99eed73064473dc">
       <child xsi:type="archimate:DiagramObject" id="id-2641015ce9b74c2487cf56aaea23f237" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-svc-teams-channel">
         <bounds x="72" y="72" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-bbe9b79afa154f5ab3e3d8d33803be43" source="id-2641015ce9b74c2487cf56aaea23f237" target="id-d8d204344621458cb1938926a1f1ee87" archimateRelationship="id-31309ba918e0477995d5048ef854beb6"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-d6ad0a842f5f42f79d91b1f279b54e3e" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-svc-oauth">
-        <bounds x="252" y="72" width="120" height="55"/>
+        <bounds x="252" y="96" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-f730ac9e726e4156a2bdb82eb7a6628c" source="id-d6ad0a842f5f42f79d91b1f279b54e3e" target="id-d8d204344621458cb1938926a1f1ee87" archimateRelationship="id-f8bfc9c65b044987b76130225b397cec"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-c9bdf484844f4a55a6d25a3844fe9c72" source="id-d6ad0a842f5f42f79d91b1f279b54e3e" target="id-de96ae6a56ac44a1a765dd24faeb567e" archimateRelationship="id-3e5f61ab7ef74328820a32849d1d9e6a"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-76b84c793eaa43d3b86f88cb394e6b20" targetConnections="id-4db2b51c97c440dabce21db924f985b3" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-purview">
-        <bounds x="468" y="72" width="120" height="55"/>
+        <bounds x="431" y="72" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-82a19245cf434133a939a7682bc803c3" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-svc-runtime">
         <bounds x="84" y="187" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-c25643988efd49bbb6a171a9a00be2c1" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-82a19245cf434133a939a7682bc803c3" target="id-d8d204344621458cb1938926a1f1ee87" archimateRelationship="id-3e834d5457a046c89da031be264041bc"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-d8d204344621458cb1938926a1f1ee87" targetConnections="id-c25643988efd49bbb6a171a9a00be2c1" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-copilot-studio">
+      <child xsi:type="archimate:DiagramObject" id="id-d8d204344621458cb1938926a1f1ee87" targetConnections="id-c25643988efd49bbb6a171a9a00be2c1 id-bbe9b79afa154f5ab3e3d8d33803be43 id-f730ac9e726e4156a2bdb82eb7a6628c id-6055d58a6ee54d23981575336edf51e3" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-copilot-studio">
         <bounds x="240" y="187" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-4db2b51c97c440dabce21db924f985b3" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-d8d204344621458cb1938926a1f1ee87" target="id-76b84c793eaa43d3b86f88cb394e6b20" archimateRelationship="r-t26"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-fe9a30bf86a54487a7579c40c72d9fea" source="id-d8d204344621458cb1938926a1f1ee87" target="id-38e4bdfb92f44023b620d4474c6346bd" archimateRelationship="id-1ece489fa00648dca87ef22fbf37792f"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-c8daee3b99b44b299f6c38d925847872" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-sp">
         <bounds x="432" y="192" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-95e4c0ddab77447db381d990822acc3c" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-c8daee3b99b44b299f6c38d925847872" target="id-f7b4992d0df04001a0d7591eb3d91ca2" archimateRelationship="r-t22"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-f7b4992d0df04001a0d7591eb3d91ca2" targetConnections="id-95e4c0ddab77447db381d990822acc3c" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-graph">
+      <child xsi:type="archimate:DiagramObject" id="id-f7b4992d0df04001a0d7591eb3d91ca2" targetConnections="id-95e4c0ddab77447db381d990822acc3c id-43fcd917f3af420896d067a987f49fef" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-graph">
         <bounds x="600" y="187" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-4360ed90a1554a178d97f21e74ca86a4" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-f7b4992d0df04001a0d7591eb3d91ca2" target="id-a91947dab8464dcfb90418027fb0a2e6" archimateRelationship="r-t23"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-a91947dab8464dcfb90418027fb0a2e6" targetConnections="id-4360ed90a1554a178d97f21e74ca86a4" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-semantic-idx">
-        <bounds x="133" y="360" width="120" height="55"/>
+        <bounds x="348" y="348" width="120" height="55"/>
         <sourceConnection xsi:type="archimate:Connection" id="id-3826a20a00614fdebed8d358f7a32718" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#000000" source="id-a91947dab8464dcfb90418027fb0a2e6" target="id-ff3e359add9945eb845e532f51131379" archimateRelationship="r-t24"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-51c086c4f4ba458997f34bf06b289d41" source="id-a91947dab8464dcfb90418027fb0a2e6" target="id-7557089ec61342e3a030c107cf7b859d" archimateRelationship="id-ddf4413a604f44189309ecfc3ca29459"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-ff3e359add9945eb845e532f51131379" targetConnections="id-3826a20a00614fdebed8d358f7a32718" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-node-aoai">
-        <bounds x="408" y="360" width="120" height="55"/>
+        <bounds x="504" y="504" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-3d9c9ff98429486db7de0ea0dff8d670" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-art-pp-connector">
         <bounds x="133" y="492" width="120" height="55"/>
       </child>
-      <child xsi:type="archimate:DiagramObject" id="id-38e4bdfb92f44023b620d4474c6346bd" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-art-manifest">
-        <bounds x="144" y="600" width="120" height="55"/>
+      <child xsi:type="archimate:DiagramObject" id="id-38e4bdfb92f44023b620d4474c6346bd" targetConnections="id-fe9a30bf86a54487a7579c40c72d9fea" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-art-manifest">
+        <bounds x="133" y="360" width="120" height="55"/>
       </child>
       <child xsi:type="archimate:DiagramObject" id="id-645959ede7d541c783352a1261e29138" font="1|Lucida Grande|12.0|0|COCOA|1|" fontColor="#000000" lineColor="#5c5c5c" fillColor="#c9e7b7" archimateElement="t-art-schema">
-        <bounds x="349" y="600" width="120" height="55"/>
+        <bounds x="576" y="348" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-43fcd917f3af420896d067a987f49fef" source="id-645959ede7d541c783352a1261e29138" target="id-f7b4992d0df04001a0d7591eb3d91ca2" archimateRelationship="id-8806aaf15fef455aaa8689172803cb2a"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-f9b11ff0800240dab07d97f08aa30e24" archimateElement="t-node-teams">
+        <bounds x="600" y="60" width="120" height="55"/>
+        <sourceConnection xsi:type="archimate:Connection" id="id-6055d58a6ee54d23981575336edf51e3" source="id-f9b11ff0800240dab07d97f08aa30e24" target="id-d8d204344621458cb1938926a1f1ee87" archimateRelationship="id-e87700423f4b4a2e9e6ec1dd069aefc5"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-de96ae6a56ac44a1a765dd24faeb567e" targetConnections="id-c9bdf484844f4a55a6d25a3844fe9c72" archimateElement="t-node-entraid">
+        <bounds x="252" y="6" width="120" height="55"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="id-7557089ec61342e3a030c107cf7b859d" targetConnections="id-51c086c4f4ba458997f34bf06b289d41" archimateElement="a-comp-semantic-index">
+        <bounds x="239" y="576" width="120" height="55"/>
       </child>
     </element>
   </folder>
