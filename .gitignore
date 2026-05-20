@@ -6,3 +6,4 @@ chroma_db1/
 chroma_db2/
 data/raw/*.pdf
 data/raw/*.html
+.DS_Store
