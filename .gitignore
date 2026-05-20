@@ -4,6 +4,7 @@ __pycache__/
 chroma_db/
 chroma_db1/
 chroma_db2/
-data/raw/*.pdf
-data/raw/*.html
+Rag_application/data/raw/*.pdf
+Rag_application/data/raw/*.html
 .DS_Store
+test/
